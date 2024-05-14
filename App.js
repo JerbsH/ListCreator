@@ -1,10 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import { getAccessToken } from './getprofile';
-
+import { getprofile } from './getprofile';
 
 export default function App() {
-  getAccessToken(process.env.CLIENT_ID, 'code')
+  getprofile();
   return (
     <View style={styles.container}>
       <Text>UI TEST</Text>
