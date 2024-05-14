@@ -11,6 +11,7 @@ export async function getprofile(){
 			const accessToken = await getAccessToken(clientId, code);
 			const profile = await fetchProfile(accessToken);
 			console.log(profile);
+			localStorage.setItem("profile", JSON.stringify(profile));
 	}
 }
 
