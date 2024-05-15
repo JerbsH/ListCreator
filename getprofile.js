@@ -10,8 +10,8 @@ export async function getprofile(){
 	} else {
 			const accessToken = await getAccessToken(clientId, code);
 			const profile = await fetchProfile(accessToken);
-			console.log(profile);
 			localStorage.setItem("profile", JSON.stringify(profile));
+			localStorage.setItem("accessToken", accessToken);
 	}
 }
 
@@ -25,7 +25,7 @@ export async function redirectToAuthCodeFlow(clientId) {
 	params.append("client_id", clientId);
 	params.append("response_type", "code");
 	params.append("redirect_uri", "http://localhost:8081/callback/");
-	params.append("scope", "user-read-private user-read-email");
+	params.append("scope", "user-read-private user-read-email playlist-modify-public playlist-modify-private");
 	params.append("code_challenge_method", "S256");
 	params.append("code_challenge", challenge);
 
