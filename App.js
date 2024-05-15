@@ -1,8 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import {
 	Pressable,
-	StyleSheet,
-	Switch,
 	Text,
 	TextInput,
 	View,
@@ -27,15 +25,6 @@ export default function App() {
 		fetchProfile();
 		setProfile(localStorage.getItem('profile'));
 	}, []);
-
-	/*
-  useEffect(() => {
-    console.log("token from App.js: " + token);
-    if (token != null) {
-      createPlaylist(token);
-    }
-  }, [token]);
-  */
 
 	return (
 		<View style={styles.container}>
