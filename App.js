@@ -1,60 +1,18 @@
-import { StatusBar } from 'expo-status-bar';
-import {
-	Pressable,
-	Text,
-	TextInput,
-	View,
-} from 'react-native';
-import { createPlaylist } from './playlist';
-import React, { useEffect } from 'react';
-import { getprofile } from './getprofile';
-import { useState } from 'react';
-import styles from './styles';
+import * as React from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import HomeScreen from './screens/HomeScreen';
+import SongsScreen from './screens/SongsScreen';
 
 export default function App() {
-	const [token, setToken] = useState(null);
-	const [profile, setProfile] = useState(null);
-	const [listName, onChangeName] = useState('Playlist Name');
-	const [listDesc, onChangeDesc] = useState('Playlist Description');
-
-	useEffect(() => {
-		const fetchProfile = async () => {
-			await getprofile();
-			setToken(localStorage.getItem('accessToken'));
-		};
-		fetchProfile();
-		setProfile(localStorage.getItem('profile'));
-	}, []);
-
+	const Stack = createNativeStackNavigator();
+	
 	return (
-		<View style={styles.container}>
-			<Text style={styles.header}>Welcome to ListCreator</Text>
-			<TextInput
-				editable
-				maxLength={40}
-				onChangeText={(text) => onChangeName(text)}
-				value={listName}
-				style={styles.textInput}
-			/>
-			<TextInput
-				editable
-				maxLength={40}
-				onChangeText={(text) => onChangeDesc(text)}
-				value={listDesc}
-				style={styles.textInput}
-			/>
-			<Pressable
-				style={styles.button}
-				onPress={async () => {
-          const res =  await createPlaylist(token, listName, listDesc)
-
-        }}
-			>
-				<Text style={styles.buttonText}>Next</Text>
-			</Pressable>
-			<StatusBar style="auto" />
-		</View>
+		<NavigationContainer>
+			<Stack.Navigator>
+				<Stack.Screen name="Home" component={HomeScreen} options={{headerShown: false}}/>
+				<Stack.Screen name="Songs" component={SongsScreen} options={{headerShown: false}}/>
+			</Stack.Navigator>
+		</NavigationContainer>
 	);
-}
-
-// onPress={() => createPlaylist(token, listName, listDesc, isEnabled)}
+};
