@@ -2,10 +2,12 @@ import styles from '../styles';
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { findAllTracks } from '../playlist';
 
 const SongsScreen = ({ navigation, route }) => {
 	const [songName, setSong] = useState('Artist - Song Name');
 	const [addedSongs, setAddedSongs] = useState([]);
+	const [trackUris, setTrackUris] = useState([]);
 
 	return (
 		<View style={styles.container}>
@@ -40,6 +42,15 @@ const SongsScreen = ({ navigation, route }) => {
 				disabled={addedSongs.length >= 5}
 			>
 				<Text style={styles.buttonText}>Add to list</Text>
+			</Pressable>
+
+			<Pressable
+				style={styles.button}
+				onPress={() => {
+					setTrackUris(findAllTracks(addedSongs));
+				}}
+			>
+				<Text style={styles.buttonText}>TEST</Text>
 			</Pressable>
 
 			<Pressable
