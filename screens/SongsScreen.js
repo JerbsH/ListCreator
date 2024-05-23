@@ -9,6 +9,12 @@ const SongsScreen = ({ navigation, route }) => {
 	const [addedSongs, setAddedSongs] = useState([]);
 	const [trackUris, setTrackUris] = useState([]);
 
+	useEffect(() => {
+		if (addedSongs.length >= 5) {
+			setTrackUris(findAllTracks(addedSongs));
+		}
+	}, [addedSongs]);
+
 	return (
 		<View style={styles.container}>
 			<Text style={styles.header}>
@@ -38,6 +44,7 @@ const SongsScreen = ({ navigation, route }) => {
 				onPress={() => {
 					setAddedSongs((prevSongs) => [...prevSongs, songName]);
 					setSong('');
+				
 				}}
 				disabled={addedSongs.length >= 5}
 			>
@@ -45,18 +52,21 @@ const SongsScreen = ({ navigation, route }) => {
 			</Pressable>
 
 			<Pressable
-				style={styles.button}
+				style={[
+					styles.button,
+					{ backgroundColor: trackUris.length < 4 ? 'grey' : 'blue' },
+				]}
 				onPress={() => {
-					setTrackUris(findAllTracks(addedSongs));
+					console.log('Track URIs:', trackUris);
 				}}
+				disabled={trackUris.length < 4}
 			>
-				<Text style={styles.buttonText}>TEST</Text>
+				<Text style={styles.buttonText}>Next</Text>
 			</Pressable>
 
 			<Pressable
 				style={styles.button}
 				onPress={() => {
-					console.log('Button pressed');
 					navigation.navigate('Home');
 				}}
 			>
