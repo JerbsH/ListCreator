@@ -2,12 +2,15 @@ import styles from '../styles';
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { findAllTracks } from '../playlist';
+import { createPlaylist, findAllTracks } from '../playlist';
 
 const SongsScreen = ({ navigation, route }) => {
 	const [songName, setSong] = useState('Artist - Song Name');
 	const [addedSongs, setAddedSongs] = useState([]);
 	const [trackUris, setTrackUris] = useState([]);
+	const [playlist, setPlaylist] = useState(null);
+
+	const token = localStorage.getItem('accessToken');
 
 	useEffect(() => {
 		if (addedSongs.length >= 5) {
@@ -57,21 +60,15 @@ const SongsScreen = ({ navigation, route }) => {
 					{ backgroundColor: trackUris.length < 4 ? 'grey' : 'blue' },
 				]}
 				onPress={() => {
-					console.log('Track URIs:', trackUris);
+					createPlaylist(token, route.params.listName, route.params.listDesc).then((value) => {
+						setPlaylist(value);
+					});
 				}}
 				disabled={trackUris.length < 4}
 			>
 				<Text style={styles.buttonText}>Next</Text>
 			</Pressable>
 
-			<Pressable
-				style={styles.button}
-				onPress={() => {
-					navigation.navigate('Home');
-				}}
-			>
-				<Text style={styles.buttonText}>Back</Text>
-			</Pressable>
 			<StatusBar style="auto" />
 		</View>
 	);

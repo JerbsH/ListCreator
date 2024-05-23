@@ -12,6 +12,7 @@ export default function App() {
 			<Stack.Navigator>
 				<Stack.Screen name="Home" component={HomeScreen} options={{headerShown: false}}/>
 				<Stack.Screen name="Songs" component={SongsScreen} options={{headerShown: false}}/>
+				<Stack.Screen name="Playlist" component={SongsScreen} options={{headerShown: false}}/>
 			</Stack.Navigator>
 		</NavigationContainer>
 	);
