@@ -49,3 +49,22 @@ export async function findAllTracks(songs){
 	return uris;
 }
 
+export async function addToPlaylist(listID, songUris){
+	const accessToken = localStorage.getItem('accessToken');
+	const result = await fetch(
+		'https://api.spotify.com/v1/playlists/' + listID + '/tracks',
+		{
+			method: 'POST',
+			headers: {
+				'Authorization': `Bearer ${accessToken}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				uris: songUris,
+				position: 0
+			}),
+		}
+	);
+
+	return await result.json();
+};

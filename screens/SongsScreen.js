@@ -2,7 +2,7 @@ import styles from '../styles';
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { createPlaylist, findAllTracks } from '../playlist';
+import { addToPlaylist, createPlaylist, findAllTracks } from '../playlist';
 
 const SongsScreen = ({ navigation, route }) => {
 	const [songName, setSong] = useState('Artist - Song Name');
@@ -14,9 +14,19 @@ const SongsScreen = ({ navigation, route }) => {
 
 	useEffect(() => {
 		if (addedSongs.length >= 5) {
-			setTrackUris(findAllTracks(addedSongs));
+			findAllTracks(addedSongs).then((value) => {
+				setTrackUris(value);
+			});
 		}
 	}, [addedSongs]);
+
+	useEffect(() => {
+		if (playlist != null) {
+			addToPlaylist(playlist.id, trackUris).then(
+				navigation.navigate('Created')
+			);
+		}
+	}, [playlist]);
 
 	return (
 		<View style={styles.container}>
@@ -47,7 +57,6 @@ const SongsScreen = ({ navigation, route }) => {
 				onPress={() => {
 					setAddedSongs((prevSongs) => [...prevSongs, songName]);
 					setSong('');
-				
 				}}
 				disabled={addedSongs.length >= 5}
 			>
@@ -60,7 +69,11 @@ const SongsScreen = ({ navigation, route }) => {
 					{ backgroundColor: trackUris.length < 4 ? 'grey' : 'blue' },
 				]}
 				onPress={() => {
-					createPlaylist(token, route.params.listName, route.params.listDesc).then((value) => {
+					createPlaylist(
+						token,
+						route.params.listName,
+						route.params.listDesc
+					).then((value) => {
 						setPlaylist(value);
 					});
 				}}
