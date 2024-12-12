@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable } from 'react-native';
 import { getprofile } from '../getprofile';
 import { StatusBar } from 'expo-status-bar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = ({ navigation }) => {
 	const [token, setToken] = useState(null);
@@ -12,14 +13,19 @@ const HomeScreen = ({ navigation }) => {
 
 	useEffect(() => {
 		const fetchProfile = async () => {
-			await getprofile();
-			setToken(localStorage.getItem('accessToken'));
+				await getprofile();
+				const accessToken = await AsyncStorage.getItem('accessToken');
+				setToken(accessToken);
 		};
 		fetchProfile();
-		setProfile(localStorage.getItem('profile'));
-	}, []);
+		const fetchProfileData = async () => {
+				const profileData = await AsyncStorage.getItem('profile');
+				setProfile(profileData);
+		};
+		fetchProfileData();
+}, []);
 
-	return (
+return (
 		<View style={styles.container}>
 			<Text style={styles.header}>Welcome to ListCreator</Text>
 			<Text>Give your playlist a name and description (optional) </Text>
