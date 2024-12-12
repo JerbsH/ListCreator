@@ -1,90 +1,110 @@
-import styles from '../styles';
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { addToPlaylist, createPlaylist, findAllTracks } from '../playlist';
+import { aiSearchSongs } from '../aiListCreation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import styles from '../styles';
 
 const SongsScreen = ({ navigation, route }) => {
-	const [songName, setSong] = useState('Artist - Song Name');
-	const [addedSongs, setAddedSongs] = useState([]);
-	const [trackUris, setTrackUris] = useState([]);
-	const [playlist, setPlaylist] = useState(null);
+    const [songName, setSong] = useState('Artist - Song Name');
+    const [addedSongs, setAddedSongs] = useState([]);
+    const [trackUris, setTrackUris] = useState([]);
+    const [playlist, setPlaylist] = useState(null);
+    const [token, setToken] = useState(null);
+    const [aiSongs, setAiSongs] = useState([]);
+    const [isNextButtonActive, setIsNextButtonActive] = useState(false);
 
-	const token = localStorage.getItem('accessToken');
+    useEffect(() => {
+        const fetchToken = async () => {
+            const accessToken = await AsyncStorage.getItem('accessToken');
+            setToken(accessToken);
+        };
+        fetchToken();
+    }, []);
 
-	useEffect(() => {
-		if (addedSongs.length >= 5) {
-			findAllTracks(addedSongs).then((value) => {
-				setTrackUris(value);
-			});
-		}
-	}, [addedSongs]);
+    useEffect(() => {
+        if (addedSongs.length >= 5) {
+            setIsNextButtonActive(true);
+        } else {
+            setIsNextButtonActive(false);
+        }
+    }, [addedSongs]);
 
-	useEffect(() => {
-		if (playlist != null) {
-			addToPlaylist(playlist.id, trackUris).then(
-				navigation.navigate('Created')
-			);
-		}
-	}, [playlist]);
+    const handleAddSong = () => {
+        if (songName && songName !== 'Artist - Song Name' && addedSongs.length < 5) {
+            setAddedSongs([...addedSongs, songName]);
+            setSong('Artist - Song Name');
+        }
+    };
 
-	return (
-		<View style={styles.container}>
-			<Text style={styles.header}>
-				List to be created: {route.params.listName}
-			</Text>
-			<Text>Add 5 songs to use as inspiration for your list</Text>
-			<Text style={styles.header}>Songs added: {addedSongs.toString()}</Text>
-			<TextInput
-				editable
-				onChangeText={(text) => setSong(text)}
-				value={songName}
-				style={styles.textInput}
-				onFocus={() => {
-					if (songName === 'Artist - Song Name') {
-						setSong('');
-					}
-				}}
-			/>
+    const handleNext = async () => {
+        try {
+            const aiResults = await aiSearchSongs(addedSongs);
+						console.log(aiResults);
+						
+            const trackUris = await findAllTracks(aiResults);
+            setTrackUris(trackUris);
 
-			<Pressable
-				style={[
-					styles.button,
-					{
-						backgroundColor: addedSongs.length >= 5 ? 'grey' : 'blue',
-					},
-				]}
-				onPress={() => {
-					setAddedSongs((prevSongs) => [...prevSongs, songName]);
-					setSong('');
-				}}
-				disabled={addedSongs.length >= 5}
-			>
-				<Text style={styles.buttonText}>Add to list</Text>
-			</Pressable>
+            const newPlaylist = await createPlaylist(token, route.params.listName, route.params.listDesc);
+            setPlaylist(newPlaylist);
 
-			<Pressable
-				style={[
-					styles.button,
-					{ backgroundColor: trackUris.length < 4 ? 'grey' : 'blue' },
-				]}
-				onPress={() => {
-					createPlaylist(
-						token,
-						route.params.listName,
-						route.params.listDesc
-					).then((value) => {
-						setPlaylist(value);
-					});
-				}}
-				disabled={trackUris.length < 4}
-			>
-				<Text style={styles.buttonText}>Next</Text>
-			</Pressable>
+            await addToPlaylist(newPlaylist.id, trackUris);
+            navigation.navigate('Created');
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
-			<StatusBar style="auto" />
-		</View>
-	);
+    return (
+        <View style={styles.container}>
+            <Text style={styles.header}>Add Songs to Playlist</Text>
+            <TextInput
+                editable
+                maxLength={40}
+                onChangeText={(text) => setSong(text)}
+                value={songName}
+                style={styles.textInput}
+                onFocus={() => {
+                    if (songName === 'Artist - Song Name') {
+                        setSong('');
+                    }
+                }}
+            />
+            <Pressable
+                style={[
+                    styles.button,
+                    {
+                        backgroundColor: addedSongs.length >= 5 ? 'grey' : 'blue',
+                    },
+                ]}
+                onPress={handleAddSong}
+                disabled={addedSongs.length >= 5}
+            >
+                <Text style={styles.buttonText}>Add Song</Text>
+            </Pressable>
+            {addedSongs.length > 0 && (
+                <View>
+                    <Text>Added Songs:</Text>
+                    {addedSongs.map((song, index) => (
+                        <Text key={index}>{song}</Text>
+                    ))}
+                </View>
+            )}
+            <Pressable
+                style={[
+                    styles.button,
+                    {
+                        backgroundColor: isNextButtonActive ? 'blue' : 'grey',
+                    },
+                ]}
+                onPress={handleNext}
+                disabled={!isNextButtonActive}
+            >
+                <Text style={styles.buttonText}>Next</Text>
+            </Pressable>
+        </View>
+    );
 };
 
 export default SongsScreen;
