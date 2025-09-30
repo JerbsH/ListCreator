@@ -1,8 +1,4 @@
 # ListCreator
-Description here
 
-## Setup
-Info about env file and such here
-
-## How to use
-Basic info here
+This is the old version of my list creator project.  
+This one is no longer being worked on and I have moved development to ListCreatorNext
